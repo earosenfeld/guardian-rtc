@@ -1,0 +1,58 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from guardian_rtc_msgs/msg/SystemStatus.msg
+// generated code does not contain a copyright notice
+
+#include "builtin_interfaces/msg/Time.idl"
+
+module guardian_rtc_msgs {
+  module msg {
+    module SystemStatus_Constants {
+      @verbatim (language="comment", text=
+        "System state")
+      const uint8 STATE_UNKNOWN = 0;
+      const uint8 STATE_INITIALIZING = 1;
+      const uint8 STATE_READY = 2;
+      const uint8 STATE_OPERATIONAL = 3;
+      const uint8 STATE_EMERGENCY = 4;
+      const uint8 STATE_SHUTDOWN = 5;
+    };
+    @verbatim (language="comment", text=
+      "System status message for GuardianRTC" "\n"
+      "Timestamp of the status message")
+    struct SystemStatus {
+      builtin_interfaces::msg::Time timestamp;
+
+      uint8 state;
+
+      @verbatim (language="comment", text=
+        "System health status")
+      boolean is_healthy;
+
+      string health_message;
+
+      @verbatim (language="comment", text=
+        "Battery information")
+      float battery_voltage;
+
+      float battery_percentage;
+
+      boolean is_charging;
+
+      @verbatim (language="comment", text=
+        "System metrics")
+      float cpu_usage;
+
+      float memory_usage;
+
+      float temperature;
+
+      @verbatim (language="comment", text=
+        "Additional status information")
+      sequence<string> active_nodes;
+
+      sequence<string> warnings;
+
+      sequence<string> errors;
+    };
+  };
+};

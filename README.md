@@ -35,6 +35,39 @@ GuardianRTC provides:
 - WebRTC (aiortc)
 - Docker support for development and CI
 
+## ROS 2 Docker Development
+
+### Building and Running the Container
+
+1. **Build and start the container:**
+   ```bash
+   docker-compose -f docker/docker-compose.yml up -d --build
+   ```
+   This will create and start a container named `docker-ros-1` by default.
+
+2. **Access the running container:**
+   ```bash
+   docker-compose -f docker/docker-compose.yml exec ros bash
+   ```
+
+3. **Build the ROS 2 workspace inside the container:**
+   ```bash
+   cd /ros_ws
+   source /opt/ros/humble/setup.bash
+   colcon build
+   ```
+
+4. **Source the workspace and run the test node:**
+   ```bash
+   source install/setup.bash
+   ros2 run guardian_rtc_msgs test_stop_event
+   ```
+
+5. **To stop and remove the container:**
+   ```bash
+   docker-compose -f docker/docker-compose.yml down
+   ```
+
 ## License
 
 Apache 2.0 - See [LICENSE](LICENSE) for details.

@@ -27,6 +27,7 @@ COPY ros_ws/src /ros_ws/src/
 # Build the workspace
 RUN . /opt/ros/humble/setup.sh \
     && cd /ros_ws \
+    && rm -rf build/ install/ log/ \
     && colcon build
 
 # Set up the entrypoint

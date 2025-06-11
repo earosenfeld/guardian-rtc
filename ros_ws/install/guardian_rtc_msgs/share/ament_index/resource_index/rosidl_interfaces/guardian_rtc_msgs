@@ -1,0 +1,10 @@
+msg/ControlCommand.idl
+msg/ControlCommand.msg
+msg/SafetyStatus.idl
+msg/SafetyStatus.msg
+msg/StopEvent.idl
+msg/StopEvent.msg
+msg/SystemConfig.idl
+msg/SystemConfig.msg
+msg/SystemStatus.idl
+msg/SystemStatus.msg
