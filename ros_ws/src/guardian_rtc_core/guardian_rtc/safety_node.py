@@ -6,10 +6,12 @@ Safety node that monitors and limits kinetic energy of robot joints.
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
-from control_msgs.msg import JointTrajectory
+from std_msgs.msg import Empty
+from guardian_rtc_core.msg import StopEvent
 from guardian_rtc.config import SafetyConfig
 from guardian_rtc.utils.dynamics import calculate_kinetic_energy
 from guardian_rtc.logger import SafetyLogger
+import time
 
 class SafetyNode(Node):
     """Node that monitors and limits kinetic energy of robot joints."""
@@ -30,15 +32,30 @@ class SafetyNode(Node):
             self.joint_state_callback,
             10)
             
-        self.cmd_jog_pub = self.create_publisher(
-            JointTrajectory,
-            'cmd_jog',
+        self.stop_pub = self.create_publisher(
+            Empty,
+            'stop_trajectory_controller',
             10)
             
+        self.event_pub = self.create_publisher(
+            StopEvent,
+            'guardianrtc/stop_event',
+            10)
+            
+        # Rate limiter for 1kHz operation
+        self.last_callback_time = 0.0
+        self.min_callback_period = 0.001  # 1ms = 1kHz
+        
         self.get_logger().info('Safety node initialized')
 
     def joint_state_callback(self, msg: JointState):
         """Process incoming joint states and enforce safety limits."""
+        # Rate limit to 1kHz
+        current_time = time.time()
+        if current_time - self.last_callback_time < self.min_callback_period:
+            return
+        self.last_callback_time = current_time
+        
         # Calculate kinetic energy
         ke = calculate_kinetic_energy(msg, self.config)
         
@@ -48,7 +65,21 @@ class SafetyNode(Node):
         # Check if we need to limit motion
         if ke > self.config.max_kinetic_energy:
             self.get_logger().warn(f'Kinetic energy {ke:.2f} exceeds limit {self.config.max_kinetic_energy:.2f}')
-            # TODO: Implement motion limiting logic
+            
+            # Publish stop command
+            stop_msg = Empty()
+            self.stop_pub.publish(stop_msg)
+            
+            # Publish stop event
+            event = StopEvent()
+            event.timestamp_ns = int(time.time_ns())
+            event.event_type = 'KE_LIMIT'
+            event.ke_j = ke
+            event.joint_positions = list(msg.position)
+            self.event_pub.publish(event)
+            
+            # Log the stop event
+            self.logger.log_stop_event(event)
 
 def main(args=None):
     rclpy.init(args=args)

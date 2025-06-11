@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GuardianRTC Teleop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #video {
+            width: 100%;
+            max-width: 640px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+            margin: 20px auto;
+        }
+        .control-btn {
+            padding: 15px;
+            font-size: 20px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .control-btn:hover {
+            background: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #e8f5e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GuardianRTC Teleoperation</h1>
+        <video id="video" autoplay playsinline></video>
+        <div class="controls">
+            <button class="control-btn" id="up">↑</button>
+            <button class="control-btn" id="left">←</button>
+            <button class="control-btn" id="right">→</button>
+            <button class="control-btn" id="down">↓</button>
+        </div>
+        <div class="status" id="status">Connecting...</div>
+    </div>
+
+    <script>
+        let pc = null;
+        let dataChannel = null;
+
+        async function start() {
+            const video = document.getElementById('video');
+            const statusDiv = document.getElementById('status');
+
+            try {
+                // Create peer connection
+                pc = new RTCPeerConnection();
+                
+                // Handle incoming video
+                pc.ontrack = function(event) {
+                    if (event.streams && event.streams[0]) {
+                        video.srcObject = event.streams[0];
+                    }
+                };
+
+                // Create data channel
+                dataChannel = pc.createDataChannel('control');
+                dataChannel.onopen = () => {
+                    statusDiv.textContent = 'Connected';
+                    statusDiv.style.background = '#e8f5e9';
+                };
+                dataChannel.onclose = () => {
+                    statusDiv.textContent = 'Disconnected';
+                    statusDiv.style.background = '#ffebee';
+                };
+
+                // Create offer
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+
+                // Send offer to server
+                const response = await fetch('/offer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sdp: pc.localDescription.sdp,
+                        type: pc.localDescription.type
+                    })
+                });
+
+                // Handle answer
+                const answer = await response.json();
+                await pc.setRemoteDescription(answer);
+
+            } catch (e) {
+                console.error(e);
+                statusDiv.textContent = 'Error: ' + e.message;
+                statusDiv.style.background = '#ffebee';
+            }
+        }
+
+        // Handle control buttons
+        const buttons = {
+            'up': 'ArrowUp',
+            'down': 'ArrowDown',
+            'left': 'ArrowLeft',
+            'right': 'ArrowRight'
+        };
+
+        for (const [id, key] of Object.entries(buttons)) {
+            const button = document.getElementById(id);
+            button.onmousedown = () => sendCommand(key);
+            button.onmouseup = () => sendCommand('stop');
+            button.ontouchstart = () => sendCommand(key);
+            button.ontouchend = () => sendCommand('stop');
+        }
+
+        function sendCommand(key) {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify({ key }));
+            }
+        }
+
+        // Start connection
+        start();
+    </script>
+</body>
+</html> 

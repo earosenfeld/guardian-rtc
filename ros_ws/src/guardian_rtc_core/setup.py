@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 from glob import glob
 
@@ -7,7 +7,8 @@ package_name = 'guardian_rtc_core'
 setup(
     name=package_name,
     version='0.1.0',
-    packages=[package_name],
+    packages=find_packages(),
+    package_dir={'': '.'},
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -15,6 +16,7 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'resource'), glob('resource/*.yaml')),
         (os.path.join('share', package_name, 'resource', 'web_assets'), glob('resource/web_assets/*')),
+        (os.path.join('share', package_name, 'msg'), glob('msg/*.msg')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -25,8 +27,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'safety_node = guardian_rtc_core.safety_node:main',
-            'teleop_bridge = guardian_rtc_core.teleop_bridge:main',
+            'safety_node = guardian_rtc.safety_node:main',
+            'teleop_bridge = guardian_rtc.teleop_bridge:main',
         ],
     },
 ) 
