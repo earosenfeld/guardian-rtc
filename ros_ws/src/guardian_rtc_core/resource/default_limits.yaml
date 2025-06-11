@@ -1,0 +1,23 @@
+# Default safety limits for GuardianRTC
+# These values should be adjusted based on the specific robot model
+
+# Maximum allowed kinetic energy (Joules)
+max_kinetic_energy: 100.0
+
+# Joint position limits (radians)
+joint_limits:
+  joint_1: [-3.14, 3.14]
+  joint_2: [-3.14, 3.14]
+  joint_3: [-3.14, 3.14]
+  joint_4: [-3.14, 3.14]
+  joint_5: [-3.14, 3.14]
+  joint_6: [-3.14, 3.14]
+
+# Joint inertia parameters (kg⋅m²)
+inertia_params:
+  joint_1: 1.0
+  joint_2: 1.0
+  joint_3: 1.0
+  joint_4: 1.0
+  joint_5: 1.0
+  joint_6: 1.0 

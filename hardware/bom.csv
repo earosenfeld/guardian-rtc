@@ -1,0 +1,7 @@
+Part Number,Description,Quantity,Unit Price,Supplier,Notes
+SW-520D,Tilt Switch,1,2.50,Digi-Key,For emergency stop
+LED-5MM-RED,5mm Red LED,1,0.50,Digi-Key,Status indicator
+RES-10K,10kΩ Resistor,2,0.10,Digi-Key,Current limiting
+CAP-100NF,100nF Capacitor,1,0.20,Digi-Key,Debouncing
+PCB-100x60,PCB Board,1,5.00,PCBWay,Double-sided
+ENCL-100x60x30,Enclosure,1,8.00,ProtoCase,ABS plastic 
