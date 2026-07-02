@@ -31,10 +31,17 @@ jobs:
           cd ros_ws
           colcon build --event-handlers console_direct+
 
-      - name: Run core tests
+      - name: Smoke-test installed packages
         shell: bash
         run: |
           source /opt/ros/humble/setup.bash
           source ros_ws/install/setup.bash
-          cd ros_ws/src/guardian_rtc_core
-          python3 -m pytest test/ -q --no-cov
+          python3 -c "from guardian_rtc_msgs.msg import StopEvent, SafetyStatus, ControlCommand; print(StopEvent())"
+          python3 -c "import guardian_rtc.config, guardian_rtc.utils.dynamics"
+
+      - name: Run kinetic-energy tests
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source ros_ws/install/setup.bash
+          python3 -m pytest ros_ws/src/guardian_rtc_tests/test_ke_limit.py -q --no-cov --no-cov

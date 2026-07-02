@@ -18,11 +18,11 @@ private:
   void publish_stop_event()
   {
     auto message = guardian_rtc_msgs::msg::StopEvent();
-    message.header.stamp = this->now();
-    message.header.frame_id = "base_link";
+    message.timestamp_ns = this->now().nanoseconds();
     message.event_type = "TEST";
-    message.priority = 1;
-    message.description = "Test stop event";
+    message.ke_j = 0.0;
+    message.joint_positions = {0.0, 0.0};
+    message.payload_id = "test";
     
     publisher_->publish(message);
     RCLCPP_INFO(this->get_logger(), "Published stop event");

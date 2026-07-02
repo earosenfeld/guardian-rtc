@@ -7,7 +7,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Empty
-from guardian_rtc_core.msg import StopEvent
+from guardian_rtc_msgs.msg import StopEvent
 from guardian_rtc.config import SafetyConfig
 from guardian_rtc.utils.dynamics import calculate_kinetic_energy
 from guardian_rtc.logger import SafetyLogger

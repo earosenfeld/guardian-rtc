@@ -6,7 +6,7 @@ import tempfile
 import json
 from mock_ros import MockNode
 from guardian_rtc.logger import SafetyLogger
-from guardian_rtc_core.msg import StopEvent
+from guardian_rtc_msgs.msg import StopEvent
 
 class TestSafetyLogger(unittest.TestCase):
     def setUp(self):

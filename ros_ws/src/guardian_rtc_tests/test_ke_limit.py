@@ -5,8 +5,8 @@ Tests for kinetic energy limiting functionality.
 import pytest
 import numpy as np
 from sensor_msgs.msg import JointState
-from guardian_rtc_core.guardian_rtc.utils.dynamics import calculate_kinetic_energy
-from guardian_rtc_core.guardian_rtc.config import SafetyConfig
+from guardian_rtc.utils.dynamics import calculate_kinetic_energy
+from guardian_rtc.config import SafetyConfig
 
 def test_kinetic_energy_calculation():
     """Test kinetic energy calculation with known inputs."""
@@ -19,8 +19,8 @@ def test_kinetic_energy_calculation():
     # Create test config with known inertia
     config = SafetyConfig(
         max_kinetic_energy=100.0,
-        joint_limits={'joint_1': [-3.14, 3.14], 'joint_2': [-3.14, 3.14]},
-        inertia_params={'joint_1': 1.0, 'joint_2': 2.0}
+        joint_limits={'joint_0': [-3.14, 3.14], 'joint_1': [-3.14, 3.14]},
+        inertia_params={'joint_0': 1.0, 'joint_1': 2.0}
     )
     
     # Calculate kinetic energy

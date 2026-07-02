@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
 import time
-from guardian_rtc_core.msg import StopEvent
+from guardian_rtc_msgs.msg import StopEvent
 
 class SafetyLogger:
     """Logger for safety events and measurements."""

@@ -1,18 +1,14 @@
-# StopEvent.msg
-# Message definition for stop events
+# Timestamp of the event (nanoseconds)
+int64 timestamp_ns
 
-# Header with timestamp and frame_id
-Header header
-
-# Event type (e.g., "EMERGENCY", "SAFETY", "USER")
+# Type of event (e.g., "KE_LIMIT", "MANUAL_STOP")
 string event_type
 
-# Priority level (1-5, where 1 is highest priority)
-uint8 priority
+# Kinetic energy at time of stop (Joules)
+float64 ke_j
 
-# Additional description of the stop event
-string description
+# Joint positions at time of stop
+float64[] joint_positions
 
-# Optional metadata as key-value pairs
-string[] metadata_keys
-string[] metadata_values 
+# Optional payload identifier
+string payload_id 
