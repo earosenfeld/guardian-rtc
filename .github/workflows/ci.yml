@@ -17,7 +17,11 @@ jobs:
 
       - name: Install Python deps
         run: |
-          apt-get update && apt-get install -y python3-pip
+          apt-get update && apt-get install -y python3-pip pkg-config \
+            libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev \
+            libavfilter-dev libswscale-dev libswresample-dev \
+            libopus-dev libvpx-dev libsrtp2-dev
+          pip3 install --upgrade pip
           pip3 install -r requirements.txt pytest pytest-cov
 
       - name: Build ROS 2 workspace
