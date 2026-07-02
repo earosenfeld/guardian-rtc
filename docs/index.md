@@ -1,6 +1,6 @@
 # GuardianRTC Documentation
 
-GuardianRTC is a real-time control system for robotic arms that provides:
+GuardianRTC is a ROS 2 safety-monitor prototype for robotic arms that provides:
 - Kinetic energy monitoring and limiting
 - WebRTC-based teleoperation
 - Event logging and compliance tracking
@@ -20,7 +20,7 @@ See the [Installation Guide](install.md) for detailed setup instructions.
 ## Architecture
 
 The system consists of several key components:
-- Safety Node: Monitors kinetic energy at 1kHz
+- Safety Node: monitors kinetic energy on each joint-state update (capped at 1 kHz)
 - Teleoperation Bridge: WebRTC interface for remote control
 - Event Logger: SQLite and JSONL logging
 - Configuration: YAML-based safety limits

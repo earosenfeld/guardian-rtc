@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container:
+      image: ros:humble
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python deps
+        run: |
+          apt-get update && apt-get install -y python3-pip
+          pip3 install -r requirements.txt pytest pytest-cov
+
+      - name: Build ROS 2 workspace
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          cd ros_ws
+          colcon build --event-handlers console_direct+
+
+      - name: Run core tests
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source ros_ws/install/setup.bash
+          cd ros_ws/src/guardian_rtc_core
+          python3 -m pytest test/ -q --no-cov

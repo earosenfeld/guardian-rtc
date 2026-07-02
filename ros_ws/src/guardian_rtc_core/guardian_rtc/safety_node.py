@@ -42,15 +42,17 @@ class SafetyNode(Node):
             'guardianrtc/stop_event',
             10)
             
-        # Rate limiter for 1kHz operation
+        # Cap KE evaluation at 1 kHz. This is a best-effort rate limit on
+        # the rclpy executor thread, not a hard real-time guarantee — the
+        # monitor runs as fast as joint_states arrive, up to this cap.
         self.last_callback_time = 0.0
-        self.min_callback_period = 0.001  # 1ms = 1kHz
+        self.min_callback_period = 0.001  # 1 ms
         
         self.get_logger().info('Safety node initialized')
 
     def joint_state_callback(self, msg: JointState):
         """Process incoming joint states and enforce safety limits."""
-        # Rate limit to 1kHz
+        # Best-effort rate cap (see __init__)
         current_time = time.time()
         if current_time - self.last_callback_time < self.min_callback_period:
             return

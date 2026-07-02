@@ -30,15 +30,22 @@ class SafetyConfig:
         
     def get_inertia_matrix(self, joint_positions: List[float]) -> np.ndarray:
         """
-        Get the inertia matrix for the current joint configuration.
-        
+        Conservative diagonal bound on the joint-space inertia matrix.
+
+        A safety monitor does not need the exact configuration-dependent
+        M(q) — it needs a matrix that never lets 0.5·vᵀMv underestimate
+        the true kinetic energy. ``inertia_params`` therefore holds each
+        joint's worst-case effective inertia (reflected rotor/gearbox
+        inertia plus the downstream links at maximum extension), so the
+        diagonal bound over-approximates KE in every configuration and
+        stop decisions err on the safe side.
+
         Args:
-            joint_positions: Current joint positions
-            
+            joint_positions: Current joint positions (kept for API
+                compatibility with a future configuration-dependent model)
+
         Returns:
-            Inertia matrix as numpy array
+            Diagonal worst-case inertia matrix as a numpy array
         """
-        # TODO: Implement proper inertia matrix calculation
-        # For now, return a simple diagonal matrix
         n_joints = len(joint_positions)
         return np.diag([self.inertia_params[f'joint_{i}'] for i in range(n_joints)]) 

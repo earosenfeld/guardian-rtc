@@ -1,6 +1,6 @@
 # GuardianRTC
 
-A real-time control system for robotic arms with WebRTC-based teleoperation and kinetic energy safety monitoring.
+A ROS 2 safety monitor for robotic arms — kinetic-energy-based stop events with WebRTC teleoperation — built as a prototype of the pattern, not a certified safety product.
 
 ## Quick Start
 
@@ -23,7 +23,7 @@ A real-time control system for robotic arms with WebRTC-based teleoperation and 
 ## Architecture
 
 GuardianRTC provides:
-- Real-time kinetic energy monitoring at 1kHz
+- Kinetic-energy monitoring on every joint-state update (rate-capped at 1 kHz; best-effort on the rclpy executor, not hard real-time)
 - WebRTC-based teleoperation interface
 - SQLite & JSONL event logging
 - Configurable safety limits per robot model

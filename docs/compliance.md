@@ -7,7 +7,7 @@ This guide explains how GuardianRTC helps meet ISO 10218 safety requirements for
 GuardianRTC implements several key safety features required by ISO 10218:
 
 1. **Kinetic Energy Monitoring**
-   - Real-time calculation at 1kHz
+   - Evaluated per joint-state update, rate-capped at 1 kHz (best-effort, not hard real-time)
    - Configurable thresholds per joint
    - Automatic motion limiting
 
