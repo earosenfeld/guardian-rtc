@@ -1,5 +1,7 @@
 # GuardianRTC
 
+[![CI](https://github.com/earosenfeld/guardian-rtc/actions/workflows/ci.yml/badge.svg)](https://github.com/earosenfeld/guardian-rtc/actions/workflows/ci.yml)
+
 A ROS 2 safety monitor for robotic arms — kinetic-energy-based stop events with WebRTC teleoperation — built as a prototype of the pattern, not a certified safety product.
 
 ![Kinetic-energy monitoring: over-speed fault crosses the limit and triggers a stop event](assets/ke_monitoring.png)
