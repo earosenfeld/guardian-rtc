@@ -2,6 +2,12 @@
 
 A ROS 2 safety monitor for robotic arms — kinetic-energy-based stop events with WebRTC teleoperation — built as a prototype of the pattern, not a certified safety product.
 
+![Kinetic-energy monitoring: over-speed fault crosses the limit and triggers a stop event](assets/ke_monitoring.png)
+
+*The check the safety node runs on every joint-state update, simulated over a
+joint-2 runaway (`scripts/make_figures.py`): KE crosses `max_kinetic_energy`
+and a `StopEvent` halts the controller.*
+
 ## Quick Start
 
 1. Install ROS 2 Humble

@@ -19,8 +19,8 @@ def test_kinetic_energy_calculation():
     # Create test config with known inertia
     config = SafetyConfig(
         max_kinetic_energy=100.0,
-        joint_limits={'joint_0': [-3.14, 3.14], 'joint_1': [-3.14, 3.14]},
-        inertia_params={'joint_0': 1.0, 'joint_1': 2.0}
+        joint_limits={'joint_1': [-3.14, 3.14], 'joint_2': [-3.14, 3.14]},
+        inertia_params={'joint_1': 1.0, 'joint_2': 2.0}
     )
     
     # Calculate kinetic energy

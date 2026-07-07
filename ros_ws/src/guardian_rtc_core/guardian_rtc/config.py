@@ -48,4 +48,4 @@ class SafetyConfig:
             Diagonal worst-case inertia matrix as a numpy array
         """
         n_joints = len(joint_positions)
-        return np.diag([self.inertia_params[f'joint_{i}'] for i in range(n_joints)]) 
+        return np.diag([self.inertia_params[f'joint_{i + 1}'] for i in range(n_joints)]) 
