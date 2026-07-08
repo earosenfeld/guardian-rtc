@@ -99,17 +99,19 @@ class SafetyLogger:
             joint_positions = event.get('joint_positions', [])
             payload_id = event.get('payload_id', '')
         else:
+            # ROS message sequences arrive as array.array — coerce to list so
+            # they are JSON-serializable.
+            joint_positions = list(event.joint_positions)
             event_dict = {
                 'timestamp_ns': event.timestamp_ns,
                 'event_type': event.event_type,
                 'ke_j': event.ke_j,
-                'joint_positions': event.joint_positions,
+                'joint_positions': joint_positions,
                 'payload_id': event.payload_id
             }
             timestamp_ns = event.timestamp_ns
             event_type = event.event_type
             ke_j = event.ke_j
-            joint_positions = event.joint_positions
             payload_id = event.payload_id
         # Log to SQLite
         self.conn.execute(
