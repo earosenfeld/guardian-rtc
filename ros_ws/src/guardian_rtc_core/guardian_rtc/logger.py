@@ -8,18 +8,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
 import time
-from guardian_rtc_msgs.msg import StopEvent
 
 class SafetyLogger:
     """Logger for safety events and measurements."""
     
-    def __init__(self, db_path: Optional[str] = None, cloud_sync: bool = False):
+    def __init__(self, db_path: Optional[str] = None, cloud_sync: bool = False,
+                 jsonl_path: Optional[str] = None):
         """
         Initialize the logger.
         
         Args:
             db_path: Path to SQLite database file. If None, uses default location.
             cloud_sync: Whether to enable cloud sync (stub for v0.2)
+            jsonl_path: Path to the JSONL event log. If None, uses a timestamped
+                file under ~/.guardianrtc/log/.
         """
         if db_path is None:
             db_path = str(Path.home() / '.guardianrtc' / 'guardianrtc.db')
@@ -32,9 +34,13 @@ class SafetyLogger:
         self._create_tables()
         
         # Setup JSONL logging
-        self.log_dir = Path('ros_ws/log')
+        if jsonl_path is None:
+            self.log_dir = Path.home() / '.guardianrtc' / 'log'
+            self.jsonl_path = self.log_dir / f'events_{int(time.time())}.jsonl'
+        else:
+            self.jsonl_path = Path(jsonl_path)
+            self.log_dir = self.jsonl_path.parent
         self.log_dir.mkdir(parents=True, exist_ok=True)
-        self.jsonl_path = self.log_dir / f'events_{int(time.time())}.jsonl'
         
         # Cloud sync flag (stub for v0.2)
         self.cloud_sync = cloud_sync

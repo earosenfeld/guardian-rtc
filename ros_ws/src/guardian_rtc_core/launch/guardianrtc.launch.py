@@ -22,7 +22,7 @@ def generate_launch_description():
         package='guardian_rtc_core',
         executable='safety_node',
         name='safety_node',
-        parameters=[config_file],
+        parameters=[{'config_file': config_file}],
         output='screen'
     )
     

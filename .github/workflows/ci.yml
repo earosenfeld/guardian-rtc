@@ -44,4 +44,11 @@ jobs:
         run: |
           source /opt/ros/humble/setup.bash
           source ros_ws/install/setup.bash
-          python3 -m pytest ros_ws/src/guardian_rtc_tests/test_ke_limit.py -q --no-cov --no-cov
+          python3 -m pytest ros_ws/src/guardian_rtc_tests/test_ke_limit.py -q --no-cov
+
+      - name: Run safety-node and logger tests
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source ros_ws/install/setup.bash
+          python3 -m pytest ros_ws/src/guardian_rtc_core/test/test_safety_node.py ros_ws/src/guardian_rtc_core/test/test_logger.py -q --no-cov --no-cov

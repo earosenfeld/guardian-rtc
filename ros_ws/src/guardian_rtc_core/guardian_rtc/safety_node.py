@@ -3,8 +3,11 @@
 Safety node that monitors and limits kinetic energy of robot joints.
 """
 
+import os
+
 import rclpy
 from rclpy.node import Node
+from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Empty
 from guardian_rtc_msgs.msg import StopEvent
@@ -19,8 +22,15 @@ class SafetyNode(Node):
     def __init__(self):
         super().__init__('safety_node')
         
-        # Load configuration
-        self.config = SafetyConfig()
+        # Load configuration: 'config_file' parameter, falling back to the
+        # package's installed default_limits.yaml.
+        self.declare_parameter('config_file', '')
+        config_file = self.get_parameter('config_file').get_parameter_value().string_value
+        if not config_file:
+            config_file = os.path.join(
+                get_package_share_directory('guardian_rtc_core'),
+                'resource', 'default_limits.yaml')
+        self.config = SafetyConfig.from_yaml(config_file)
         
         # Initialize logger
         self.logger = SafetyLogger()

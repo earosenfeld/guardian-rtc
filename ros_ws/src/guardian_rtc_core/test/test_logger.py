@@ -1,94 +1,58 @@
 #!/usr/bin/env python3
+"""Tests for SafetyLogger's SQLite + JSONL persistence."""
 
-import unittest
-import os
-import tempfile
 import json
-from mock_ros import MockNode
+import tempfile
+from pathlib import Path
+
+import pytest
+
 from guardian_rtc.logger import SafetyLogger
-from guardian_rtc_msgs.msg import StopEvent
 
-class TestSafetyLogger(unittest.TestCase):
-    def setUp(self):
-        # Create a temporary directory for test files
-        self.test_dir = tempfile.mkdtemp()
-        self.db_path = os.path.join(self.test_dir, 'test.db')
-        self.jsonl_path = os.path.join(self.test_dir, 'test.jsonl')
-        
-        # Initialize the logger
-        self.logger = SafetyLogger(
-            db_path=self.db_path,
-            jsonl_path=self.jsonl_path,
-            cloud_sync=False
-        )
 
-    def tearDown(self):
-        # Clean up test files
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
-        if os.path.exists(self.jsonl_path):
-            os.remove(self.jsonl_path)
-        os.rmdir(self.test_dir)
+@pytest.fixture()
+def logger(tmp_path):
+    lg = SafetyLogger(
+        db_path=str(tmp_path / "test.db"),
+        jsonl_path=str(tmp_path / "events.jsonl"),
+    )
+    yield lg
+    lg.conn.close()
 
-    def test_ke_measurement_logging(self):
-        """Test that kinetic energy measurements are logged correctly"""
-        # Log a test measurement
-        timestamp = 1234567890
-        ke_value = 10.5
-        self.logger.log_ke_measurement(timestamp, ke_value)
 
-        # Verify SQLite database
-        cursor = self.logger.conn.cursor()
-        cursor.execute("SELECT timestamp, ke_value FROM ke_measurements")
-        result = cursor.fetchone()
-        self.assertIsNotNone(result)
-        self.assertEqual(result[0], timestamp)
-        self.assertEqual(result[1], ke_value)
+def test_ke_measurement_logged_to_sqlite_and_jsonl(logger):
+    logger.log_ke_measurement(10.5)
 
-        # Verify JSONL file
-        with open(self.jsonl_path, 'r') as f:
-            line = f.readline()
-            data = json.loads(line)
-            self.assertEqual(data['timestamp'], timestamp)
-            self.assertEqual(data['ke_value'], ke_value)
+    row = logger.conn.execute(
+        "SELECT event_type, ke_j FROM events"
+    ).fetchone()
+    assert row == ("KE_MEASUREMENT", 10.5)
 
-    def test_stop_event_logging(self):
-        """Test that stop events are logged correctly"""
-        # Log a test stop event
-        timestamp = 1234567890
-        event_type = "KE_LIMIT"
-        ke_value = 15.0
-        joint_positions = [0.1, 0.2, 0.3]
-        payload_id = "test_payload"
-        
-        self.logger.log_stop_event(
-            timestamp=timestamp,
-            event_type=event_type,
-            ke_value=ke_value,
-            joint_positions=joint_positions,
-            payload_id=payload_id
-        )
+    data = json.loads(Path(logger.jsonl_path).read_text().splitlines()[0])
+    assert data["event_type"] == "KE_MEASUREMENT"
+    assert data["ke_j"] == 10.5
+    assert data["exceeded_limit"] is False
 
-        # Verify SQLite database
-        cursor = self.logger.conn.cursor()
-        cursor.execute("SELECT timestamp, event_type, ke_value, joint_positions, payload_id FROM events")
-        result = cursor.fetchone()
-        self.assertIsNotNone(result)
-        self.assertEqual(result[0], timestamp)
-        self.assertEqual(result[1], event_type)
-        self.assertEqual(result[2], ke_value)
-        self.assertEqual(json.loads(result[3]), joint_positions)
-        self.assertEqual(result[4], payload_id)
 
-        # Verify JSONL file
-        with open(self.jsonl_path, 'r') as f:
-            line = f.readline()
-            data = json.loads(line)
-            self.assertEqual(data['timestamp'], timestamp)
-            self.assertEqual(data['event_type'], event_type)
-            self.assertEqual(data['ke_value'], ke_value)
-            self.assertEqual(data['joint_positions'], joint_positions)
-            self.assertEqual(data['payload_id'], payload_id)
+def test_stop_event_logged_with_all_fields(logger):
+    event = {
+        "timestamp_ns": 1234567890,
+        "event_type": "KE_LIMIT",
+        "ke_j": 15.0,
+        "joint_positions": [0.1, 0.2, 0.3],
+        "payload_id": "test_payload",
+    }
+    logger.log_stop_event(event)
 
-if __name__ == '__main__':
-    unittest.main() 
+    row = logger.conn.execute(
+        "SELECT timestamp_ns, event_type, ke_j, joint_positions, payload_id FROM events"
+    ).fetchone()
+    assert row[0] == 1234567890
+    assert row[1] == "KE_LIMIT"
+    assert row[2] == 15.0
+    assert json.loads(row[3]) == [0.1, 0.2, 0.3]
+    assert row[4] == "test_payload"
+
+    data = json.loads(Path(logger.jsonl_path).read_text().splitlines()[0])
+    assert data["event_type"] == "KE_LIMIT"
+    assert data["joint_positions"] == [0.1, 0.2, 0.3]
