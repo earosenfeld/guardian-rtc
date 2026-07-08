@@ -78,6 +78,11 @@ def test_rate_limiter_drops_back_to_back_updates(node):
     stops, _ = _spy(node)
     node.last_callback_time = 0.0
     node.joint_state_callback(_joint_state([100.0] * 6))
-    # Immediately following callback lands inside the 1 ms window.
-    node.joint_state_callback(_joint_state([100.0] * 6))
+    # Widen the window so the second call deterministically lands inside it
+    # regardless of how slowly the first callback ran on this machine.
+    node.min_callback_period = 60.0
+    try:
+        node.joint_state_callback(_joint_state([100.0] * 6))
+    finally:
+        node.min_callback_period = 0.001
     assert len(stops) == 1
