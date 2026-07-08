@@ -30,15 +30,16 @@ class SafetyConfig:
         
     def get_inertia_matrix(self, joint_positions: List[float]) -> np.ndarray:
         """
-        Conservative diagonal bound on the joint-space inertia matrix.
+        Diagonal approximation of the joint-space inertia matrix.
 
         A safety monitor does not need the exact configuration-dependent
-        M(q) — it needs a matrix that never lets 0.5·vᵀMv underestimate
-        the true kinetic energy. ``inertia_params`` therefore holds each
-        joint's worst-case effective inertia (reflected rotor/gearbox
-        inertia plus the downstream links at maximum extension), so the
-        diagonal bound over-approximates KE in every configuration and
-        stop decisions err on the safe side.
+        M(q); this prototype uses per-joint effective inertias from
+        ``inertia_params`` (intended as worst-case values: reflected
+        rotor/gearbox inertia plus downstream links at maximum extension).
+        Note this is a heuristic, not a proven bound — a diagonal matrix
+        upper-bounds 0.5·vᵀM(q)v only if each entry dominates M(q)'s
+        largest eigenvalue contribution, which must be established per
+        robot when configuring real limits.
 
         Args:
             joint_positions: Current joint positions (kept for API
